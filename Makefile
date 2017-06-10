@@ -2,6 +2,7 @@ CC := gcc
 AVR_CC := avr-gcc
 CFLAGS := -std=c11 -g -Wall -Wextra -pedantic
 PC_CFLAGS := -O0 -Isrc/Unity/src
+PC_CLIBS := -lSDL2
 AVR_CFLAGS := -mmcu=atmega328p -Os -DF_CPU=16000000ul
 
 DEVICE ?= /dev/ttyACM0
@@ -22,7 +23,7 @@ build/avr/%.elf:
 
 build/pc/%.elf:
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(PC_CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(PC_CFLAGS) $(PC_CLIBS) -o $@ $^
 
 .PRECIOUS: build/avr/%.s
 build/avr/%.s: build/avr/%.elf
@@ -51,7 +52,7 @@ build/avr/receiver.elf: build/avr/receiver.o build/avr/uart.o
 AVR_SOURCES = $(addprefix src/,font.c indexmap.c screen.c mem.c tft.c fonts.c disp.c pin.c spi_sw.c panic_avr.c app.c)
 AVR_OBJECTS = $(patsubst src/%,build/avr/%,$(patsubst %.c,%.o,${AVR_SOURCES}))
 
-PC_SOURCES = $(addprefix src/,font.c indexmap.c screen.c mem.c tft.c fonts.c disp.c pin_pc.c spi_print.c panic_pc.c delay_pc.c)
+PC_SOURCES = $(addprefix src/,font.c indexmap.c screen.c mem.c fonts.c disp.c pin_pc.c spi_print.c panic_pc.c delay_pc.c app.c)
 PC_OBJECTS = $(patsubst src/%,build/pc/%,$(patsubst %.c,%.o,${PC_SOURCES}))
 
 build/avr/main_avr.elf: build/avr/main_avr.o ${AVR_OBJECTS}
